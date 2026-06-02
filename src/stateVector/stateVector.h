@@ -20,7 +20,7 @@ class stateVector {
 
     private:
         MatrixXcd constructFullMatrix(Matrix2cd& gate, int targetQubit);
-        MatrixXcd stateVector::constructFullMatrix(Matrix4cd& gate, int controlBit, int targetBit);
+        MatrixXcd constructFullMatrix(Matrix4cd& gate, int controlBit, int targetBit);
         void applySwap(int qubit1, int qubit2);
 
         int _n_qubits;

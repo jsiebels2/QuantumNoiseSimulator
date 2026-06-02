@@ -14,6 +14,7 @@ add_library(qnoise_core
     src/core/density_matrix.cpp
     src/core/channel.cpp
     src/circuit/circuit.cpp
+    src/stateVector/stateVector.cpp
 )
 
 target_link_libraries(qnoise_core Eigen3::Eigen)
@@ -29,3 +30,8 @@ if(APPLE)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 endif()
+
+find_package(GTest REQUIRED)
+
+add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
+target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
