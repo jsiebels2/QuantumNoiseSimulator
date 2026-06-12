@@ -2,6 +2,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/KroneckerProduct>
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;
@@ -66,6 +67,10 @@ MatrixXcd stateVector::constructFullMatrix(Matrix2cd& gate, int target) {
 }
 
 MatrixXcd stateVector::constructFullMatrix(Matrix4cd& gate, int controlBit, int targetBit) {
+    if(_n_qubits == 2) {
+        return gate;
+    }
+    
     int minQubit = min(controlBit, targetBit);
     MatrixXcd result;
 
@@ -79,12 +84,14 @@ MatrixXcd stateVector::constructFullMatrix(Matrix4cd& gate, int controlBit, int 
     for(int i = 1; i < _n_qubits; i++) {
         if(i == minQubit) {
             result = kroneckerProduct(result, gate).eval();
+            cout << result;
             i++;
         }
         else {
-            result = kroneckerProduct(result, I);
+            result = kroneckerProduct(result, I).eval();
         }
     }
+    cout << endl;
 
     return result;
 }
