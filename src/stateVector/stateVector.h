@@ -15,7 +15,7 @@ class stateVector {
         void applyTwoQubitGate(Matrix4cd& gate, int controlBit, int targetBit);
 
         int numQubits() const { return _n_qubits; }
-        int dimensione() const { return dimensions_; }
+        int dimensions() const { return dimensions_; }
         VectorXcd getCurrentState() const { return data_; }
 
     private:

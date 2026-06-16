@@ -7,6 +7,13 @@
 using namespace std;
 using namespace Eigen;
 
+/*
+This is currently not optimized to be able able to scale because of the construction of the full matrix.
+Every full matrix that we are multiplying by the state vector when applying our gates is 2^n x 2^n dimensions,
+which multiplying by another statevector of 2^nx2^n gives a time of 4^n which is not practical. This should be scaled
+before completeion.
+*/
+
 Matrix2cd I = MatrixXcd::Identity(2,2);
 
 stateVector::stateVector(int numQubits) {

@@ -35,3 +35,10 @@ find_package(GTest REQUIRED)
 
 add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
 target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
+
+add_executable(test_density_matrix tests/cpp/test_density_matrix.cpp)
+target_link_libraries(test_density_matrix qnoise_core GTest::GTest GTest::Main)
+
+set_target_properties(qnoise_cpp PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/qnoise
+)
