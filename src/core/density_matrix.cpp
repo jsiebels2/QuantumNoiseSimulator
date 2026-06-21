@@ -59,15 +59,13 @@ double DensityMatrix::purity() const {
 }
 
 MatrixXcd DensityMatrix::constructFullGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
-    bool applied = false;
-    MatrixXcd fullGate = MatrixXcd::Identity(_dim, _dim);
+    MatrixXcd fullGate(1,1);
+    fullGate(0,0) = 1.0; // Start with identity
 
-    for(int qubit: qubitIndices) {
-        if(!applied) {
+    for(int i = 0; i < _n_qubits; i++) {
+        if(find(qubitIndices.begin(), qubitIndices.end(), i) != qubitIndices.end()) {
             fullGate = kroneckerProduct(fullGate, gate).eval();
-            applied = true;
-        }
-        else {
+        } else {
             fullGate = kroneckerProduct(fullGate, MatrixXcd::Identity(2, 2)).eval();
         }
     } 
