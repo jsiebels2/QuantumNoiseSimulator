@@ -1,3 +1,4 @@
+#pragma once
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -18,8 +19,8 @@ namespace Qnoise {
 
     inline Eigen::Matrix2cd PAULI_Y() {
         Eigen::Matrix2cd m;
-        m << 0, (0.0, -1.0),
-             (0.0, 1.0), 0;
+        m << 0, -1i,
+            1i, 0;
         return m;
     };
 }

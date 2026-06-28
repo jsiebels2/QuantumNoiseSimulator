@@ -1,13 +1,13 @@
 #include <Eigen/Dense>
 #include <cmath>
-#include "amplitude_dampening.hpp"
-#include "../constants.hpp"
+#include "amplitude_damping.hpp"
+#include "../../constants.hpp"
 
 using namespace std;
 
-AmplitudeDampening::AmplitudeDampening(double g) : _gamma(g) {}
+AmplitudeDamping::AmplitudeDamping(double g) : _gamma(g) {}
 
-vector<Eigen::MatrixXcd> AmplitudeDampening::getKrausOps() const {
+vector<Eigen::MatrixXcd> AmplitudeDamping::getKrausOps() const {
     Matrix2cd K0, K1;
 
     K0 << 1,    0,

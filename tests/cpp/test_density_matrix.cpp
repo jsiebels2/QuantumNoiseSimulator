@@ -1,4 +1,4 @@
-#include "core/density_matrix.hpp"
+#include "core/DensityMatrix/density_matrix.hpp"
 #include "stateVector/stateVector.h"
 #include <gtest/gtest.h>
 
