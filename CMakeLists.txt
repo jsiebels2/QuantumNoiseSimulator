@@ -11,9 +11,12 @@ include_directories(src)
 
 # C++ core library
 add_library(qnoise_core
-    src/core/density_matrix.cpp
-    src/core/channel.cpp
-    src/circuit/circuit.cpp
+    src/core/DensityMatrix/density_matrix.cpp
+    src/stateVector/stateVector.cpp
+    src/core/channels/AmplitudeDamping/amplitude_damping.cpp
+    src/core/channels/BitPhaseFlips/bit_phase_flips.cpp
+    src/core/channels/DepolarizingNoise/depolarizing_noise.cpp
+    src/core/channels/PhaseDamping/phase_damping.cpp
 )
 
 target_link_libraries(qnoise_core Eigen3::Eigen)
@@ -29,3 +32,18 @@ if(APPLE)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 endif()
+
+find_package(GTest REQUIRED)
+
+add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
+target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
+
+add_executable(test_density_matrix tests/cpp/test_density_matrix.cpp)
+target_link_libraries(test_density_matrix qnoise_core GTest::GTest GTest::Main)
+
+add_executable(test_noise_channels tests/cpp/test_noise_channels.cpp)
+target_link_libraries(test_noise_channels qnoise_core GTest::GTest GTest::Main)
+
+set_target_properties(qnoise_cpp PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/qnoise
+)
