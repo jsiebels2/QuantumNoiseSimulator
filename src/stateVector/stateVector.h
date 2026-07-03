@@ -11,17 +11,15 @@ class stateVector {
         explicit stateVector(int numQubits);
 
         //apply the corresponding gate that gets past through
-        void applySingleQubitGate(Matrix2cd& gate, int qubit);
-        void applyTwoQubitGate(Matrix4cd& gate, int controlBit, int targetBit);
+        void applyGate(const string gateName, const vector<int>& qubitIndices);
+        void applyGate(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices);
 
         int numQubits() const { return _n_qubits; }
         int dimensions() const { return dimensions_; }
         VectorXcd getCurrentState() const { return data_; }
 
     private:
-        MatrixXcd constructFullMatrix(Matrix2cd& gate, int targetQubit);
-        MatrixXcd constructFullMatrix(Matrix4cd& gate, int controlBit, int targetBit);
-        void applySwap(int qubit1, int qubit2);
+        MatrixXcd constructFullMatrix(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices);
 
         int _n_qubits;
         int dimensions_; // 2^n

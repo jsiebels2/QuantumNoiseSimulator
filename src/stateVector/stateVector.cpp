@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/KroneckerProduct>
 #include <iostream>
+#include <core/constants.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -24,92 +25,32 @@ stateVector::stateVector(int numQubits) {
     data_[0] = {1.0, 0.0};
 } 
 
-void stateVector::applySingleQubitGate(Matrix2cd& gate, int qubit) {
-    MatrixXcd fullMatrix = constructFullMatrix(gate, qubit);
-    data_ = fullMatrix * data_;
+void stateVector::applyGate(const string gateName, const vector<int>& qubitIndices) {
+    auto it = Qnoise::gateMap.find(gateName);
+
+    if(it == Qnoise::gateMap.end()) {
+        throw invalid_argument("Gate not supported: " + gateName);
+    }
+
+    applyGate(it->second, qubitIndices);
 }
 
-void stateVector::applyTwoQubitGate(Matrix4cd& gate, int controlBit, int targetBit) {
-    if(controlBit == targetBit) {
-        throw("Cannot apply a two qubit gate on the same qubit");
-    }
-
-    if(abs(controlBit - targetBit) != 1) {
-        int minQubit = min(controlBit, targetBit);
-        int maxQubit = max(controlBit, targetBit);
-
-        int temp = minQubit;
-        
-        for(int i = minQubit; i < maxQubit - 1; i++) {
-            applySwap(i, i + 1);
-            temp++;
-        }
-
-        MatrixXcd fullMatrix = constructFullMatrix(gate, temp, maxQubit);
-        data_ = fullMatrix * data_;
-
-        for(int i = maxQubit - 1; i > minQubit; i--) {
-            applySwap(i-1, i);
-        }
-    }
-    else {
-       MatrixXcd fullMatrix = constructFullMatrix(gate, controlBit, targetBit);
-       data_ = fullMatrix * data_; 
-    }
+void stateVector::applyGate(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices) {
+    MatrixXcd fullgate = constructFullMatrix(gateMatrix, qubitIndices);
+    data_ = fullgate * data_;
 }
 
-MatrixXcd stateVector::constructFullMatrix(Matrix2cd& gate, int target) {
-    MatrixXcd result = (target == 0) ? gate : I;
+MatrixXcd stateVector::constructFullMatrix(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices) {
+    MatrixXcd fullGate(1,1);
+    fullGate(0,0) = 1.0; // Start with identity
 
-    for(int i = 1; i < _n_qubits; i++) {
-        if(i == target) {
-            result = kroneckerProduct(result, gate).eval();
+    for(int i = 0; i < _n_qubits; i++) {
+        if(find(qubitIndices.begin(), qubitIndices.end(), i) != qubitIndices.end()) {
+            fullGate = kroneckerProduct(fullGate, gateMatrix).eval();
+        } else {
+            fullGate = kroneckerProduct(fullGate, MatrixXcd::Identity(2, 2)).eval();
         }
-        else {
-            result = kroneckerProduct(result, I).eval();
-        }
-    }
+    } 
 
-    return result;
-}
-
-MatrixXcd stateVector::constructFullMatrix(Matrix4cd& gate, int controlBit, int targetBit) {
-    if(_n_qubits == 2) {
-        return gate;
-    }
-    
-    int minQubit = min(controlBit, targetBit);
-    MatrixXcd result;
-
-    if(minQubit == 0) {
-        result = gate;
-    }
-    else {
-        result = I;
-    }
-
-    for(int i = 1; i < _n_qubits; i++) {
-        if(i == minQubit) {
-            result = kroneckerProduct(result, gate).eval();
-            cout << result;
-            i++;
-        }
-        else {
-            result = kroneckerProduct(result, I).eval();
-        }
-    }
-    cout << endl;
-
-    return result;
-}
-
-void stateVector::applySwap(int qubit1, int qubit2) {
-    Matrix4cd swap;
-
-    swap << 1, 0, 0, 0,
-            0, 0, 1, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 1;
-
-    applyTwoQubitGate(swap, qubit1, qubit2);
+    return fullGate;
 }

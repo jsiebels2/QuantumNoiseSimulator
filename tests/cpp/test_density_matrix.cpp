@@ -20,8 +20,7 @@ TEST(DensityMatrixTest, FromStateVectorComplex) {
     H << 1/sqrt(2), 1/sqrt(2),
          1/sqrt(2), -1/sqrt(2);
 
-    sv.applySingleQubitGate(H, 0);
-    sv.applySingleQubitGate(H, 1);
+    sv.applyGate("h", {0, 1});
 
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
 

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/KroneckerProduct>
+#include <unordered_map>
+#include "core/constants.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -15,23 +17,14 @@ DensityMatrix DensityMatrix::fromStateVector(const stateVector& sv) {
     return dm;
 }
 
-DensityMatrix DensityMatrix::maximallyMixed(int numQubits) {
-    DensityMatrix dm;
-    dm._n_qubits = numQubits;
-    dm._dim = 1 << numQubits; // 2^n
-    dm._data = MatrixXcd::Identity(dm._dim, dm._dim) / static_cast<double>(dm._dim);
+void DensityMatrix::applyGate(const string gateName, const vector<int>& qubitIndices) {
+    auto it = Qnoise::gateMap.find(gateName);
 
-    return dm;
-}
+    if(it == Qnoise::gateMap.end()) {
+        throw invalid_argument("Gate not supported: " + gateName);
+    }
 
-DensityMatrix DensityMatrix::fromMixedState(int numQubits, int basisStateIndex) {
-    DensityMatrix dm;
-    dm._n_qubits = numQubits;
-    dm._dim = 1 << numQubits; // 2^n
-    dm._data = MatrixXcd::Zero(dm._dim, dm._dim);
-    dm._data(basisStateIndex, basisStateIndex) = 1.0;
-
-    return dm;
+    applyGate(it->second, qubitIndices);
 }
 
 void DensityMatrix::applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
