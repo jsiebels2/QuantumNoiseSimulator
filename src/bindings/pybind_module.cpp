@@ -4,7 +4,7 @@
 #include <pybind11/complex.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
-#include "stateVector/stateVector.h"
+#include "core/stateVector/stateVector.h"
 #include "core/DensityMatrix/density_matrix.hpp"
 #include "core/channels/AmplitudeDamping/amplitude_damping.hpp"
 #include "core/channels/BitPhaseFlips/bit_phase_flips.hpp"
@@ -24,9 +24,6 @@ PYBIND11_MODULE(qnoise_cpp, m) {
         .def("applyGate", py::overload_cast<const string, const vector<int>&>(&stateVector::applyGate), py::arg("gateName"), py::arg("qubitIndices"),
             "Apply a single qubit gate to the specified qubit")
 
-        .def("applyGate", py::overload_cast<const MatrixXcd&, const vector<int>&>(&stateVector::applyGate), py::arg("gateMatrix"), py::arg("qubitIndices"),
-            "Apply a single qubit gate to the specified qubit")
-
         .def_property_readonly("getCurrentState", &stateVector::getCurrentState,
             "Get the current state of the state vector")
 
@@ -44,9 +41,6 @@ PYBIND11_MODULE(qnoise_cpp, m) {
         .def("applyGate", py::overload_cast<const string, const vector<int>&>(&DensityMatrix::applyGate), py::arg("gateName"), py::arg("qubit_indices"),
             "Apply a gate to the density matrix")   
         
-        .def("applyGate", py::overload_cast<const MatrixXcd&, const vector<int>&>(&DensityMatrix::applyGate), py::arg("gateMatrix"), py::arg("qubit_indices"),
-            "Apply a gate to the density matrix")
-        
         .def("applyKrausOperator", &DensityMatrix::applyKrausOperator, py::arg("kraus_operators"), py::arg("qubit_indices"),
             "Apply kraus operators to the density matrix")
 
@@ -56,7 +50,7 @@ PYBIND11_MODULE(qnoise_cpp, m) {
         .def("dimensions", &DensityMatrix::dimensions,
             "Get the dimensions of the density matrix")
 
-        .def("getDensityMatrix", &DensityMatrix::getDensityMatrix,
+        .def("getCurrentState", &DensityMatrix::getCurrentState,
             "Get the denstiy matrix")
 
         .def("trace", &DensityMatrix::trace,

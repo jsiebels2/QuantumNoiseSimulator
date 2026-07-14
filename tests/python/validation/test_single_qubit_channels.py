@@ -28,7 +28,7 @@ def run_qnoise_noise_simulator(gate: str, noiseChannel: str, p: float):
     model = build_qnoise_noise_channel(noiseChannel, p)
     dm.applyGate(gate, {0})
     model.apply(dm, {0})
-    return dm.getDensityMatrix()
+    return dm.getCurrentState()
 
 def build_qiskit_noise_channel(channel: str, p: float):
     match channel:

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
-#include "stateVector/stateVector.h"
+#include "core/stateVector/stateVector.h"
 
 using namespace std;
 using namespace Eigen;
@@ -37,7 +37,7 @@ TEST(StateVectorTest, TwoQubitSystem) {
     EXPECT_TRUE(sv.getCurrentState().isApprox(expected1));
 
     VectorXcd expected2(4);
-    expected2 << complex<double>(0.0, 0.0), complex<double>(0.0, 0.0), complex<double>(1.0, 0.0), complex<double>(0.0, 0.0);
+    expected2 << complex<double>(0.0, 0.0), complex<double>(1.0, 0.0), complex<double>(0.0, 0.0), complex<double>(0.0, 0.0);
 
     sv.applyGate("x", {0});
 
@@ -48,33 +48,23 @@ TEST(StateVectorTest, TwoQubitSystem) {
 
     sv.applyGate("x", {1});
 
-    EXPECT_TRUE(sv.getCurrentState().isApprox(expected3));
+    EXPECT_TRUE(sv.getCurrentState().isApprox(expected3)) << "The expected state vector was: " << expected3 << "\nBut the actual state vectore was: " << sv.getCurrentState() << endl;
 }
 
-// TEST(StateVectorTest, TwoQubitGateOnTwoQubitSystem) {
-//     stateVector sv(2);
+TEST(StateVectorTest, TwoQubitGateOnTwoQubitSystem) {
+    stateVector sv(2);
 
-//     Matrix2cd H;
-//     H << complex<double>(1/sqrt(2), 0), complex<double>(1/sqrt(2), 0),
-//         complex<double>(1/sqrt(2),0 ), complex<double>(-1/sqrt(2), 0);
+    sv.applyGate("h", {0, 1});
 
-//     sv.applyGate("h", {0, 1});
+    VectorXcd ex1(4);
+    ex1 << complex<double>(0.5, 0), complex<double>(0.5, 0), complex<double>(0.5, 0), complex<double>(0.5, 0);
 
-//     VectorXcd ex1(4);
-//     ex1 << complex<double>(0.5, 0), complex<double>(0.5, 0), complex<double>(0.5, 0), complex<double>(0.5, 0);
+    EXPECT_TRUE((sv.getCurrentState().isApprox(ex1)));
 
-//     EXPECT_TRUE((sv.getCurrentState().isApprox(ex1)));
+    sv.applyGate("cx", {0, 1});
 
-//     Matrix4cd CNOT;
-//     CNOT << 1, 0, 0, 0,
-//             0, 1, 0, 0,
-//             0, 0, 0, 1,
-//             0, 0, 1, 0;
+    VectorXcd ex2(4);
+    ex2 << complex<double>(0.5, 0.0), complex<double>(0.5, 0.0), complex<double>(0.5, 0.0), complex<double>(0.5, 0.0);
 
-//     sv.applyGate(CNOT, {0, 1});
-
-//     VectorXcd ex2(4);
-//     ex2 << complex<double>(0.5, 0.0), complex<double>(0.5, 0.0), complex<double>(0.5, 0.0), complex<double>(0.5, 0.0);
-
-//     EXPECT_TRUE((sv.getCurrentState().isApprox(ex2)));
-// }
+    EXPECT_TRUE((sv.getCurrentState().isApprox(ex2)));
+}

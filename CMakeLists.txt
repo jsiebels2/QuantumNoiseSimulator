@@ -12,7 +12,7 @@ include_directories(src)
 # C++ core library
 add_library(qnoise_core
     src/core/DensityMatrix/density_matrix.cpp
-    src/stateVector/stateVector.cpp
+    src/core/stateVector/stateVector.cpp
     src/core/channels/AmplitudeDamping/amplitude_damping.cpp
     src/core/channels/BitPhaseFlips/bit_phase_flips.cpp
     src/core/channels/DepolarizingNoise/depolarizing_noise.cpp

@@ -28,7 +28,7 @@ currentState = sv.getCurrentState
 
 dm = DensityMatrix.fromStateVector(sv)
 
-print("Density Matrix from the state vector:\n", dm.getDensityMatrix())
+print("Density Matrix from the state vector:\n", dm.getCurrentState())
 
 print("My State after applying the hadimard gate to qubit 0:", currentState)
 print("Qiskit State after applying the hadimard gate to qubit 0:", qiskit_sv.data)

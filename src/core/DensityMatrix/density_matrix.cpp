@@ -24,21 +24,74 @@ void DensityMatrix::applyGate(const string gateName, const vector<int>& qubitInd
         throw invalid_argument("Gate not supported: " + gateName);
     }
 
-    applyGate(it->second, qubitIndices);
+    if(qubitIndices.size() > 1 && it->second.rows() == 2 && it->second.cols() == 2) {
+        //If the same single qubit gate needs to be applied to multiple qubits
+        for(auto& qbit: qubitIndices) {
+            _data = applyGate(it->second, {qbit});
+        }
+    }
+    else {
+        //Two qubit state
+        _data = applyGate(it->second, qubitIndices);
+    }
 }
 
-void DensityMatrix::applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
-    MatrixXcd fullGate = constructFullGate(gate, qubitIndices);
-    MatrixXcd uDagger = fullGate.adjoint();
-    _data = fullGate * _data * uDagger;
+MatrixXcd DensityMatrix::applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
+    int k = qubitIndices.size();
+    int groupSize = 1 << k;
+    MatrixXcd gateAdjoint = gate.adjoint();
+    MatrixXcd newDm = _data;
+
+    for(int row = 0; row < _dim; row++) {
+        for(int col = 0; col < _dim; col++) {
+            bool isBase = true;
+            for(const auto& qubit: qubitIndices) {
+                if(((row >> qubit) & 1) || ((col >> qubit) & 1)) {
+                    isBase = false;
+                    break;
+                }
+            }
+            if(!isBase) continue;
+
+            MatrixXcd amplitudes(groupSize, groupSize);
+            MatrixXi rowIndices(groupSize, groupSize);
+            MatrixXi colIndices(groupSize, groupSize);
+            for(int r = 0; r < groupSize; r++) {
+                for(int c = 0; c < groupSize; c++) {
+                    int idxR = row;
+                    int idxC = col;
+                    for(int i = 0; i < k; i++) {
+                        if(((r >> i) & 1)) {
+                            idxR |= 1 << qubitIndices[k - 1 - i];
+                        }
+                        if((c >> i) & 1) {
+                            idxC |= 1 << qubitIndices[k - 1 - i];
+                        }
+                    }
+                    amplitudes(r, c) = newDm(idxR, idxC);
+                    rowIndices(r, c) = idxR;
+                    colIndices(r, c) = idxC;
+                }
+            }
+
+            MatrixXcd newBlock = gate * amplitudes * gateAdjoint;
+
+            for(int i = 0; i < groupSize; i++) {
+                for(int j = 0; j < groupSize; j++) {
+                    newDm(rowIndices(i,j), colIndices(i,j)) = newBlock(i,j);
+                }
+            }
+        }
+    }
+
+    return newDm;
 }
 
 void DensityMatrix::applyKrausOperator(const vector<MatrixXcd>& krausOp, const vector<int>& qubitIndices) {
     MatrixXcd rhoPrime = MatrixXcd::Zero(_dim, _dim);
 
     for(const auto& K: krausOp) {
-        MatrixXcd fullK = constructFullGate(K, qubitIndices);
-        rhoPrime += fullK * _data * fullK.adjoint();
+        rhoPrime += applyGate(K, qubitIndices);
     }
     _data = rhoPrime;
 }
@@ -51,17 +104,3 @@ double DensityMatrix::purity() const {
     return (_data * _data).trace().real();
 }
 
-MatrixXcd DensityMatrix::constructFullGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
-    MatrixXcd fullGate(1,1);
-    fullGate(0,0) = 1.0; // Start with identity
-
-    for(int i = 0; i < _n_qubits; i++) {
-        if(find(qubitIndices.begin(), qubitIndices.end(), i) != qubitIndices.end()) {
-            fullGate = kroneckerProduct(fullGate, gate).eval();
-        } else {
-            fullGate = kroneckerProduct(fullGate, MatrixXcd::Identity(2, 2)).eval();
-        }
-    } 
-
-    return fullGate;
-}

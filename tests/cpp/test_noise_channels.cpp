@@ -3,7 +3,7 @@
 #include "core/channels/BitPhaseFlips/bit_phase_flips.cpp"
 #include "core/channels/DepolarizingNoise/depolarizing_noise.cpp"
 #include "core/channels/PhaseDamping/phase_damping.cpp"
-#include "stateVector/stateVector.h"
+#include "core/stateVector/stateVector.h"
 #include "core/DensityMatrix/density_matrix.hpp"
 
 TEST(NoiseChannelTest, TestAmplitudDampingPurity) {
@@ -27,10 +27,6 @@ TEST(NoiseChannelTest, TestAmplitudeDampingOnExistingState) {
     stateVector sv(1);
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
 
-    Matrix2cd h;
-    h << 1/sqrt(2), 1/sqrt(2),
-         1/sqrt(2), -1/sqrt(2);
-
     Matrix2cd exp1;
     exp1 << 0.5, 0.5,
             0.5, 0.5;
@@ -38,9 +34,9 @@ TEST(NoiseChannelTest, TestAmplitudeDampingOnExistingState) {
     for(auto& y: gammaValues) {
         AmplitudeDamping ch(y);
         DensityMatrix newMatrix = dm;
-        newMatrix.applyGate(h, {0});
+        newMatrix.applyGate("h", {0});
 
-        Matrix2cd m = newMatrix.getDensityMatrix();
+        Matrix2cd m = newMatrix.getCurrentState();
         MatrixXcd p_squared = m * m;
         double trace = p_squared.trace().real();
 
@@ -54,7 +50,7 @@ TEST(NoiseChannelTest, TestAmplitudeDampingOnExistingState) {
 
         ch.apply(newMatrix, {0});
 
-        m = newMatrix.getDensityMatrix();
+        m = newMatrix.getCurrentState();
         p_squared = m * m;
         trace = p_squared.trace().real();
 
@@ -94,10 +90,6 @@ TEST(NoiseChannelTest, BitAndPhaseFlipOnExistingState) {
     stateVector sv(1);
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
 
-    Matrix2cd h;
-    h << 1/sqrt(2), 1/sqrt(2),
-         1/sqrt(2), -1/sqrt(2);
-
     Matrix2cd exp0;
     exp0 << 0.5, 0.5,
             0.5, 0.5;
@@ -105,9 +97,9 @@ TEST(NoiseChannelTest, BitAndPhaseFlipOnExistingState) {
     for(auto& p: pValues) {
         BitPhaseFlips ch(p);
         DensityMatrix newMatrix = dm;
-        newMatrix.applyGate(h, {0});
+        newMatrix.applyGate("h", {0});
 
-        Matrix2cd m = newMatrix.getDensityMatrix();
+        Matrix2cd m = newMatrix.getCurrentState();
         MatrixXcd p_squared = m * m;
         double trace = p_squared.trace().real();
 
@@ -121,7 +113,7 @@ TEST(NoiseChannelTest, BitAndPhaseFlipOnExistingState) {
 
         ch.apply(newMatrix, {0});
         
-        m = newMatrix.getDensityMatrix();
+        m = newMatrix.getCurrentState();
         p_squared = m * m;
         trace = p_squared.trace().real();
 
@@ -159,10 +151,6 @@ TEST(NoiseChannelTest, TestDepolarizingNoiseOnExistingState) {
     stateVector sv(1);
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
 
-    Matrix2cd h;
-    h << 1/sqrt(2), 1/sqrt(2),
-         1/sqrt(2), -1/sqrt(2);
-
     Matrix2cd exp1;
     exp1 << 0.5, 0.5,
             0.5, 0.5;
@@ -170,9 +158,9 @@ TEST(NoiseChannelTest, TestDepolarizingNoiseOnExistingState) {
     for(auto& p: pValues) {
         DepolarizingNoise ch(p);
         DensityMatrix newMatrix = dm;
-        newMatrix.applyGate(h, {0});
+        newMatrix.applyGate("h", {0});
 
-        Matrix2cd m = newMatrix.getDensityMatrix();
+        Matrix2cd m = newMatrix.getCurrentState();
         MatrixXcd p_squared = m * m;
         double trace = p_squared.trace().real();
 
@@ -186,7 +174,7 @@ TEST(NoiseChannelTest, TestDepolarizingNoiseOnExistingState) {
 
         ch.apply(newMatrix, {0});
         
-        m = newMatrix.getDensityMatrix();
+        m = newMatrix.getCurrentState();
         p_squared = m * m;
         trace = p_squared.trace().real();
 
@@ -222,10 +210,6 @@ TEST(NoiseChannelTest, TestPhaseDampingOnExistingState) {
     stateVector sv(1);
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
 
-    Matrix2cd h;
-    h << 1/sqrt(2), 1/sqrt(2),
-         1/sqrt(2), -1/sqrt(2);
-
     Matrix2cd exp1;
     exp1 << 0.5, 0.5,
             0.5, 0.5;
@@ -233,9 +217,9 @@ TEST(NoiseChannelTest, TestPhaseDampingOnExistingState) {
     for(auto& y: gammaValues) {
         PhaseDamping ch(y);
         DensityMatrix newMatrix = dm;
-        newMatrix.applyGate(h, {0});
+        newMatrix.applyGate("h", {0});
 
-        Matrix2cd m = newMatrix.getDensityMatrix();
+        Matrix2cd m = newMatrix.getCurrentState();
         MatrixXcd p_squared = m * m;
         double trace = p_squared.trace().real();
 
@@ -249,7 +233,7 @@ TEST(NoiseChannelTest, TestPhaseDampingOnExistingState) {
 
         ch.apply(newMatrix, {0});
 
-        m = newMatrix.getDensityMatrix();
+        m = newMatrix.getCurrentState();
         p_squared = m * m;
         trace = p_squared.trace().real();
 
