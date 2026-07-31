@@ -10,6 +10,7 @@
 #include "core/channels/BitPhaseFlips/bit_phase_flips.hpp"
 #include "core/channels/DepolarizingNoise/depolarizing_noise.hpp"
 #include "core/channels/PhaseDamping/phase_damping.hpp"
+#include "core/QuantumCircuit/QuantumCircuit.hpp"
 
 namespace py = pybind11;
 
@@ -20,16 +21,12 @@ PYBIND11_MODULE(qnoise_cpp, m) {
         // Methods
         .def(py::init<int>(), py::arg("num_qubits"),
             "Create am |0...0> state with the given number of qubits")
-
         .def("applyGate", py::overload_cast<const string, const vector<int>&>(&stateVector::applyGate), py::arg("gateName"), py::arg("qubitIndices"),
             "Apply a single qubit gate to the specified qubit")
-
         .def_property_readonly("getCurrentState", &stateVector::getCurrentState,
             "Get the current state of the state vector")
-
         .def_property_readonly("getDimensions", &stateVector::dimensions,
             "Get the dimensions of the state vector")
-
         .def_property_readonly("getQubits", &stateVector::numQubits,
             "Get the number of qubits of the state vector");
     
@@ -37,25 +34,18 @@ PYBIND11_MODULE(qnoise_cpp, m) {
         //Methods
         .def_static("fromStateVector", &DensityMatrix::fromStateVector, py::arg("state_vector"),
             "Create a density matrix from a state vector")
-        
         .def("applyGate", py::overload_cast<const string, const vector<int>&>(&DensityMatrix::applyGate), py::arg("gateName"), py::arg("qubit_indices"),
             "Apply a gate to the density matrix")   
-        
         .def("applyKrausOperator", &DensityMatrix::applyKrausOperator, py::arg("kraus_operators"), py::arg("qubit_indices"),
             "Apply kraus operators to the density matrix")
-
         .def("numQubits", &DensityMatrix::numQubits,
             "Get the number of qubits")
-
         .def("dimensions", &DensityMatrix::dimensions,
             "Get the dimensions of the density matrix")
-
         .def("getCurrentState", &DensityMatrix::getCurrentState,
             "Get the denstiy matrix")
-
         .def("trace", &DensityMatrix::trace,
             "Get the trace of the density matrix")
-
         .def("purity", &DensityMatrix::purity,
             "Get the purity of the density matrix");
         
@@ -79,4 +69,13 @@ PYBIND11_MODULE(qnoise_cpp, m) {
     py::class_<PhaseDamping, KrausChannel>(m, "PhaseDamping")
         //methods
         .def(py::init<double>(), py::arg("gamma"));
+
+    py::class_<QuantumCircuit>(m, "QuantumCircuit")
+        //methods
+        .def(py::init<int>(), py::arg("numQubits"))
+        .def("addGate", &QuantumCircuit::addGate, py::arg("gate"), py::arg("qubits"))
+        .def("executeWithoutNoise", &QuantumCircuit::executeWithoutNoise)
+        .def("executeWithPosteriorNoise", &QuantumCircuit::executeWithPosteriorNoise, py::arg("noiseChannel"), py::arg("gamma"))
+        .def("executeConcurrentNoise", &QuantumCircuit::executeConcurrentNoise, py::arg("noiseChannel"), py::arg("gamma"))
+        .def("getCircuit", &QuantumCircuit::getCircuit);
 }

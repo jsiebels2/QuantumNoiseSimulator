@@ -17,6 +17,7 @@ add_library(qnoise_core
     src/core/channels/BitPhaseFlips/bit_phase_flips.cpp
     src/core/channels/DepolarizingNoise/depolarizing_noise.cpp
     src/core/channels/PhaseDamping/phase_damping.cpp
+    src/core/QuantumCircuit/QuantumCircuit.cpp
 )
 
 target_link_libraries(qnoise_core Eigen3::Eigen)

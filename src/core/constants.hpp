@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <unordered_map>
+#include "channels/noise_channels.hpp"
 
 namespace Qnoise {
     inline Eigen::Matrix2cd PAULI_X() {
