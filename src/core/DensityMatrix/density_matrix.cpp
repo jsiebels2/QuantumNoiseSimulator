@@ -91,9 +91,17 @@ void DensityMatrix::applyKrausOperator(const vector<MatrixXcd>& krausOp, const v
     MatrixXcd rhoPrime = MatrixXcd::Zero(_dim, _dim);
 
     for(const auto& K: krausOp) {
-        rhoPrime += applyGate(K, qubitIndices);
+        MatrixXcd newK = K;
+        if(qubitIndices.size() > 1) {
+            newK = tensoredNoiseChannels(K);
+        }
+        rhoPrime += applyGate(newK, qubitIndices);
     }
     _data = rhoPrime;
+}
+
+MatrixXcd DensityMatrix::tensoredNoiseChannels(const Matrix2cd& krausOp) {
+    return kroneckerProduct(krausOp, krausOp);
 }
 
 double DensityMatrix::trace() const {
