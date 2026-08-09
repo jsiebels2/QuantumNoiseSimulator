@@ -6,7 +6,7 @@ build-backend = "scikit_build_core.build"
 wheel.packages = ["python/qnoise"]
 
 [project]
-name = "qnoise"           # what people type in `pip install noise-simulator`
+name = "qnoisesim"           # what people type in `pip install noise-simulator`
 version = "0.1.0"
 description = "A quantum noise simulator validated against Qiskit Aer"
 readme = "README.md"

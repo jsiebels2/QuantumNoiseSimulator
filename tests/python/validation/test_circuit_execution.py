@@ -1,5 +1,5 @@
 import pytest
-from qnoise import qnoise_cpp
+from qnoise import qnoise
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
 import numpy as np
@@ -32,7 +32,7 @@ def construct_qiskit_circuit(numQubits: int, circuit: dict):
     return sv
 
 def construct_qnoise_circuit(numQubits: int, circuit: dict):
-    qc = qnoise_cpp.QuantumCircuit(numQubits)
+    qc = qnoise.QuantumCircuit(numQubits)
 
     for gate, qubits in circuit:
         if(is_multi_Qubit_Circuit(gate)):
@@ -54,7 +54,7 @@ def is_multi_Qubit_Circuit(gate: str):
             return False
 
 
-def statevectors_match(sv_qiskit, sv_qnoise: qnoise_cpp.StateVector) -> bool:
+def statevectors_match(sv_qiskit, sv_qnoise: qnoise.StateVector) -> bool:
     a = np.array(sv_qiskit)
     b = np.array(sv_qnoise.getCurrentState)
     idx = np.flatnonzero(np.abs(a) > 1e-10)

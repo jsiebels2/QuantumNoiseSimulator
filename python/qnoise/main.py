@@ -1,8 +1,8 @@
-from qnoise_cpp import StateVector
+from qnoise import StateVector
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
 import numpy as np
-from qnoise_cpp import DensityMatrix
+from qnoise import DensityMatrix
 
 # My cpp state vector class
 sv = StateVector(2)

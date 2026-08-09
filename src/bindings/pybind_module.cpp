@@ -14,7 +14,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(qnoise_cpp, m) {
+PYBIND11_MODULE(qnoise, m) {
     m.doc() = "Quantum noise simulator C++ core";
 
     py::class_<stateVector>(m, "StateVector")
