@@ -1,0 +1,20 @@
+[build-system]
+requires = ["scikit_build_core>=0.4", "pybind11>=2.10"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+wheel.packages = ["python/qnoise"]
+
+[project]
+name = "qnoise"           # what people type in `pip install noise-simulator`
+version = "0.1.0"
+description = "A quantum noise simulator validated against Qiskit Aer"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "pybind11>=2.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/jsiebels2/QuantumNoiseSimulator"

@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 #include <iostream>
-#include "stateVector/stateVector.h"
+#include "../stateVector/stateVector.h"
 
 using namespace std;
 using namespace Eigen;
@@ -16,13 +16,12 @@ class DensityMatrix {
 
         // Operations
         void applyGate(const string gateName, const vector<int>& qubitIndices);
-        void applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices);
         void applyKrausOperator(const vector<MatrixXcd>& krausOp, const vector<int>& qubitIndices);
 
         // Getters
         int numQubits() const { return _n_qubits; }
         int dimensions() const { return _dim; }
-        MatrixXcd getDensityMatrix() const { return _data; }
+        MatrixXcd getCurrentState() const { return _data; }
 
         double trace() const;
         double purity() const;
@@ -30,7 +29,8 @@ class DensityMatrix {
         int _n_qubits;
         int _dim; // 2^n
         MatrixXcd _data;
-        MatrixXcd constructFullGate(const MatrixXcd& gate, const vector<int>& qubitIndices);
+        MatrixXcd applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices);
+        MatrixXcd tensoredNoiseChannels(const Matrix2cd& krausOp);
 };
 
 #endif

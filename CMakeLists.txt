@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.15)
 project(quantum_noise_sim)
+include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 17)
+
+FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG        3.4.0
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(eigen)
 
 find_package(Eigen3 REQUIRED)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
@@ -12,11 +21,12 @@ include_directories(src)
 # C++ core library
 add_library(qnoise_core
     src/core/DensityMatrix/density_matrix.cpp
-    src/stateVector/stateVector.cpp
+    src/core/stateVector/stateVector.cpp
     src/core/channels/AmplitudeDamping/amplitude_damping.cpp
     src/core/channels/BitPhaseFlips/bit_phase_flips.cpp
     src/core/channels/DepolarizingNoise/depolarizing_noise.cpp
     src/core/channels/PhaseDamping/phase_damping.cpp
+    src/core/QuantumCircuit/QuantumCircuit.cpp
 )
 
 target_link_libraries(qnoise_core Eigen3::Eigen)
@@ -33,17 +43,20 @@ if(APPLE)
     )
 endif()
 
-find_package(GTest REQUIRED)
+option(BUILD_TESTS "Build C++ tests" OFF)
 
-add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
-target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
+if(BUILD_TESTS)
+    find_package(GTest REQUIRED)
+    add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
+    target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
+    add_executable(test_density_matrix tests/cpp/test_density_matrix.cpp)
+    target_link_libraries(test_density_matrix qnoise_core GTest::GTest GTest::Main)
+    add_executable(test_noise_channels tests/cpp/test_noise_channels.cpp)
+    target_link_libraries(test_noise_channels qnoise_core GTest::GTest GTest::Main)
+endif()
 
-add_executable(test_density_matrix tests/cpp/test_density_matrix.cpp)
-target_link_libraries(test_density_matrix qnoise_core GTest::GTest GTest::Main)
-
-add_executable(test_noise_channels tests/cpp/test_noise_channels.cpp)
-target_link_libraries(test_noise_channels qnoise_core GTest::GTest GTest::Main)
-
-set_target_properties(qnoise_cpp PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/qnoise
-)
+if(NOT SKBUILD)
+    set_target_properties(qnoise_cpp PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/qnoise
+    )
+endif()

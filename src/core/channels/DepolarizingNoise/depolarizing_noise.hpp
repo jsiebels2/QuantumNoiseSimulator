@@ -1,7 +1,7 @@
 #ifndef DEPOLARIZING_NOISE
 #define DEPOLARIZING_NOISE
 
-#include "../../kraus_channel.hpp"
+#include "core/kraus_channel.hpp"
 
 class DepolarizingNoise : public KrausChannel {
     public:
