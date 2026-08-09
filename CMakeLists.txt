@@ -32,8 +32,8 @@ add_library(qnoise_core
 target_link_libraries(qnoise_core Eigen3::Eigen)
 
 # Python bindings
-pybind11_add_module(qnoise_cpp src/bindings/pybind_module.cpp)
-target_link_libraries(qnoise_cpp PRIVATE qnoise_core Eigen3::Eigen)
+pybind11_add_module(qnoise src/bindings/pybind_module.cpp)
+target_link_libraries(qnoise PRIVATE qnoise_core Eigen3::Eigen)
 
 if(APPLE)
     execute_process(
@@ -56,7 +56,7 @@ if(BUILD_TESTS)
 endif()
 
 if(NOT SKBUILD)
-    set_target_properties(qnoise_cpp PROPERTIES
+    set_target_properties(qnoise PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/qnoise
     )
 endif()

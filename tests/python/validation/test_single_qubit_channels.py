@@ -1,5 +1,5 @@
 import pytest
-from qnoise import qnoise_cpp
+from qnoise import qnoise
 from qiskit_aer.noise import amplitude_damping_error, phase_damping_error, depolarizing_error, pauli_error, NoiseModel
 from qiskit_aer import AerSimulator
 from qiskit_aer.library import save_density_matrix
@@ -23,8 +23,8 @@ def run_qiskit_noise(gate: str, noiseChannel, p: float):
     return result.data()['density_matrix'].data
 
 def run_qnoise_noise_simulator(gate: str, noiseChannel: str, p: float):
-    sv = qnoise_cpp.StateVector(1)
-    dm = qnoise_cpp.DensityMatrix.fromStateVector(sv)
+    sv = qnoise.StateVector(1)
+    dm = qnoise.DensityMatrix.fromStateVector(sv)
     model = build_qnoise_noise_channel(noiseChannel, p)
     dm.applyGate(gate, {0})
     model.apply(dm, {0})
@@ -46,13 +46,13 @@ def build_qiskit_noise_channel(channel: str, p: float):
 def build_qnoise_noise_channel(channel: str, p: float):
     match channel:
         case "Amplitude Damping":
-            return qnoise_cpp.AmplitudeDamping(p)
+            return qnoise.AmplitudeDamping(p)
         case 'Depolarizing Noise':
-            return qnoise_cpp.DepolarizingNoise(p)
+            return qnoise.DepolarizingNoise(p)
         case "Phase Damping":
-            return qnoise_cpp.PhaseDamping(p)
+            return qnoise.PhaseDamping(p)
         case "Bit Phase Flip":
-            return qnoise_cpp.BitPhaseFlip(p)
+            return qnoise.BitPhaseFlip(p)
         case _:
             raise KeyError("There is not support for " + channel) 
         

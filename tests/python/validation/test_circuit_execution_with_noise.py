@@ -1,5 +1,5 @@
 import pytest
-from qnoise import qnoise_cpp
+from qnoise import qnoise
 from qiskit_aer.noise import amplitude_damping_error, phase_damping_error, depolarizing_error, pauli_error, NoiseModel
 from qiskit_aer import AerSimulator
 from qiskit_aer.library import save_density_matrix
@@ -61,7 +61,7 @@ def construct_multi_qubit_noise_channel(noiseChannel, p):
     return kraus_error(joint)
 
 def construct_qnoise_circuit(numQubits: int, circuit, noiseChannel: str, p: float):
-    qc = qnoise_cpp.QuantumCircuit(numQubits)
+    qc = qnoise.QuantumCircuit(numQubits)
 
     for gate, qubits in circuit:
         if(is_multi_Qubit_Circuit(gate)):
@@ -102,13 +102,13 @@ def build_qiskit_noise_channel(channel: str, p: float):
 def build_qnoise_noise_channel(channel: str, p: float):
     match channel:
         case "amplitude-damping":
-            return qnoise_cpp.AmplitudeDamping(p)
+            return qnoise.AmplitudeDamping(p)
         case 'depolarizing-noise':
-            return qnoise_cpp.DepolarizingNoise(p)
+            return qnoise.DepolarizingNoise(p)
         case "phase-damping":
-            return qnoise_cpp.PhaseDamping(p)
+            return qnoise.PhaseDamping(p)
         case "bit-phase-flips":
-            return qnoise_cpp.BitPhaseFlip(p)
+            return qnoise.BitPhaseFlip(p)
         case _:
             raise KeyError("There is not support for " + channel) 
 
