@@ -5,7 +5,7 @@ A high-performance quantum noise simulation library with a C++ core exposed via 
 ## Installation
  
 ```bash
-pip install qnoise
+pip install qnoisesim
 ```
  
 > **Note:** Installation compiles a C++ extension. You'll need a C++ compiler (Xcode CLT on macOS, `build-essential` on Linux, MSVC on Windows).
