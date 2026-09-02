@@ -26,21 +26,24 @@ stateVector::stateVector(int numQubits) {
 } 
 
 void stateVector::applyGate(const string gateName, const vector<int>& qubitIndices) {
-    auto it = Qnoise::gateMap.find(gateName);
+    vector<int> controlQubits = {};
+    int numQubits = qubitIndices.size();
 
-    if(it == Qnoise::gateMap.end()) {
-        throw invalid_argument("Gate not supported: " + gateName);
+    if(numQubits > 1) {
+        controlQubits.assign(qubitIndices.begin(), qubitIndices.begin() + numQubits);
     }
 
-    if(qubitIndices.size() > 1 && it->second.rows() == 2 && it->second.cols() == 2) {
+    auto gate = Qnoise::getGateMatrix(gateName, controlQubits);
+
+    if(qubitIndices.size() > 1 && gate.rows() == 2 && gate.cols() == 2) {
         //If the same single qubit gate needs to be applied to multiple qubits
         for(auto& qbit: qubitIndices) {
-            applyGate(it->second, {qbit});
+            applyGate(gate, {qbit});
         }
     }
     else {
         //Two qubit state
-        applyGate(it->second, qubitIndices);
+        applyGate(gate, qubitIndices);
     }
 }
 

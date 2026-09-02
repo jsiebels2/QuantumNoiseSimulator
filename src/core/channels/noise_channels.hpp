@@ -1,5 +1,6 @@
 #ifndef NOISE_CHANNELS
 
+#include <memory>
 #include "core/channels/AmplitudeDamping/amplitude_damping.hpp"
 #include "core/channels/BitPhaseFlips/bit_phase_flips.hpp"
 #include "core/channels/DepolarizingNoise/depolarizing_noise.hpp"

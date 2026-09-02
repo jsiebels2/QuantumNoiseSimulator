@@ -18,21 +18,24 @@ DensityMatrix DensityMatrix::fromStateVector(const stateVector& sv) {
 }
 
 void DensityMatrix::applyGate(const string gateName, const vector<int>& qubitIndices) {
-    auto it = Qnoise::gateMap.find(gateName);
-
-    if(it == Qnoise::gateMap.end()) {
-        throw invalid_argument("Gate not supported: " + gateName);
+    vector<int> controlQubits = {};
+    int numQubits = qubitIndices.size();
+    
+    if(numQubits > 1) {
+        controlQubits.assign(qubitIndices.begin(), qubitIndices.begin() + numQubits);
     }
 
-    if(qubitIndices.size() > 1 && it->second.rows() == 2 && it->second.cols() == 2) {
+    auto it = Qnoise::getGateMatrix(gateName, controlQubits);
+    
+    if(numQubits > 1 && it.rows() == 2 && it.cols() == 2) {
         //If the same single qubit gate needs to be applied to multiple qubits
         for(auto& qbit: qubitIndices) {
-            _data = applyGate(it->second, {qbit});
+            _data = applyGate(it, {qbit});
         }
     }
     else {
         //Two qubit state
-        _data = applyGate(it->second, qubitIndices);
+        _data = applyGate(it, qubitIndices);
     }
 }
 
