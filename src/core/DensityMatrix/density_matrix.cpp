@@ -22,7 +22,7 @@ void DensityMatrix::applyGate(const string gateName, const vector<int>& qubitInd
     int numQubits = qubitIndices.size();
     
     if(numQubits > 1) {
-        controlQubits.assign(qubitIndices.begin(), qubitIndices.begin() + numQubits);
+        controlQubits.assign(qubitIndices.begin() + 1, qubitIndices.begin() + numQubits);
     }
 
     auto it = Qnoise::getGateMatrix(gateName, controlQubits);

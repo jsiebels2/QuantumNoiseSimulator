@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
-#include "core/stateVector/stateVector.h"
+#include "core/stateVector/stateVector.hpp"
 
 using namespace std;
 using namespace Eigen;

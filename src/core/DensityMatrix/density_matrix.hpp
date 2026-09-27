@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 #include <iostream>
-#include "../stateVector/stateVector.h"
+#include "../stateVector/stateVector.hpp"
 
 using namespace std;
 using namespace Eigen;

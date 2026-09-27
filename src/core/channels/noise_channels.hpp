@@ -1,3 +1,4 @@
+#pragma once
 #ifndef NOISE_CHANNELS
 
 #include <memory>

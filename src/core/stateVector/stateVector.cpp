@@ -1,4 +1,4 @@
-#include "stateVector.h"
+#include "stateVector.hpp"
 #include <cmath>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/KroneckerProduct>
@@ -11,7 +11,7 @@ using namespace Eigen;
 /*
 This is currently not optimized to be able able to scale because of the construction of the full matrix.
 Every full matrix that we are multiplying by the state vector when applying our gates is 2^n x 2^n dimensions,
-which multiplying by another statevector of 2^nx2^n gives a time of 4^n which is not practical. This should be scaled
+which multiplying by another stateVector of 2^nx2^n gives a time of 4^n which is not practical. This should be scaled
 before completeion.
 */
 
@@ -30,7 +30,7 @@ void stateVector::applyGate(const string gateName, const vector<int>& qubitIndic
     int numQubits = qubitIndices.size();
 
     if(numQubits > 1) {
-        controlQubits.assign(qubitIndices.begin(), qubitIndices.begin() + numQubits);
+        controlQubits.assign(qubitIndices.begin() + 1, qubitIndices.begin() + numQubits);
     }
 
     auto gate = Qnoise::getGateMatrix(gateName, controlQubits);

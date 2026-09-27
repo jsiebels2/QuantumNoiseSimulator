@@ -8,7 +8,7 @@ using namespace Eigen;
 
 class stateVector {
     public:
-        explicit stateVector(int numQubits);
+        stateVector(int numQubits);
 
         //apply the corresponding gate that gets past through
         void applyGate(const string gateName, const vector<int>& qubitIndices);
@@ -16,6 +16,7 @@ class stateVector {
         int numQubits() const { return _n_qubits; }
         int dimensions() const { return dimensions_; }
         VectorXcd getCurrentState() const { return data_; }
+        void changeStateVector(VectorXcd sv) { data_ = sv; }
 
     private:
         int _n_qubits;

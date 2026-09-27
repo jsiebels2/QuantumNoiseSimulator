@@ -105,8 +105,9 @@ namespace Qnoise {
         {"cz", PAULI_Z()}
     };
 
-    inline Eigen::MatrixXcd constructControlMatrix(const string gateName, Eigen::Matrix2cd baseMatrix, const vector<int> controls) {
-        int n = controls.size();
+    inline Eigen::MatrixXcd constructControlMatrix(const string gateName, Eigen::Matrix2cd baseMatrix, const vector<int> controlQubits) {
+        int n = controlQubits.size();
+        cout << n << endl;
         MatrixXcd CNU, pN;
         Matrix2cd outerProdOne;
 
@@ -114,11 +115,13 @@ namespace Qnoise {
                          0, 1;
         
         pN = outerProdOne;
-        for(int i = 0; i < n; i++) {
-            pN = Eigen::kroneckerProduct(pN, outerProdOne);
+        for(int i = 1; i < n; i++) {
+            pN = Eigen::kroneckerProduct(pN, outerProdOne).eval();
         }
 
         CNU = Eigen::kroneckerProduct(MatrixXcd::Identity(std::pow(2, n), std::pow(2, n)) - pN, MatrixXcd::Identity(2,2)) + Eigen::kroneckerProduct(pN, baseMatrix);
+
+        cout << "I have a valid CNU" << endl;
 
         return CNU;
     }
