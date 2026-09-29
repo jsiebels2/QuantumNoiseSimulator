@@ -1,0 +1,7 @@
+pybind11
+numpy
+pytest
+qiskit
+qiskit-aer
+qutip
+qiskit-dynamics
