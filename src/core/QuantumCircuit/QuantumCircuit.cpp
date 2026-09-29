@@ -58,7 +58,7 @@ DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, dou
     currentDm = densityMatrix;
     NoiseChannel nc = createNoiseChannel(noiseChannel, gamma);
 
-    for(int i = 0; i < sv.dimensions(); i++) {
+    for(int i = 0; i < _n_qubits; i++) {
         densityMatrix.applyKrausOperator(nc.getKrausOps(), {i});
     }
 

@@ -51,7 +51,12 @@ if(APPLE)
     )
 endif()
 
-option(BUILD_TESTS "Build C++ tests" OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+option(BUILD_TESTS "Build C++ tests" ON)
 
 if(BUILD_TESTS)
     enable_testing()

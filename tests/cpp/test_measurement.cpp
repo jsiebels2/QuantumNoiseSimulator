@@ -62,6 +62,8 @@ TEST(MeasurementTest, PosteriorNoiseCollapseKnownState) {
     qc.addGate("measure", {0});
     qc.executeWithPosteriorNoise("depolarizing-noise", 0);
 
+    cout << "cleanly ran execution" << endl; //debug
+
     Eigen::VectorXcd sv = qc.getCurrentStateVector();
     cout << sv;
     EXPECT_NEAR(std::abs(sv[0]), 0.0, 1e-9);  // |0⟩ amplitude = 0

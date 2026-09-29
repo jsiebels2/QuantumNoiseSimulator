@@ -30,16 +30,16 @@ void DensityMatrix::applyGate(const string gateName, const vector<int>& qubitInd
     if(numQubits > 1 && it.rows() == 2 && it.cols() == 2) {
         //If the same single qubit gate needs to be applied to multiple qubits
         for(auto& qbit: qubitIndices) {
-            _data = applyGate(it, {qbit});
+            _data = applyGateMatrix(it, {qbit});
         }
     }
     else {
         //Two qubit state
-        _data = applyGate(it, qubitIndices);
+        _data = applyGateMatrix(it, qubitIndices);
     }
 }
 
-MatrixXcd DensityMatrix::applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices) {
+MatrixXcd DensityMatrix::applyGateMatrix(const MatrixXcd& gate, const vector<int>& qubitIndices) {
     int k = qubitIndices.size();
     int groupSize = 1 << k;
     MatrixXcd gateAdjoint = gate.adjoint();
@@ -98,7 +98,8 @@ void DensityMatrix::applyKrausOperator(const vector<MatrixXcd>& krausOp, const v
         if(qubitIndices.size() > 1) {
             newK = tensoredNoiseChannels(K);
         }
-        rhoPrime += applyGate(newK, qubitIndices);
+        rhoPrime += applyGateMatrix(newK, qubitIndices);
+        cout << rhoPrime << endl;
     }
     _data = rhoPrime;
 }

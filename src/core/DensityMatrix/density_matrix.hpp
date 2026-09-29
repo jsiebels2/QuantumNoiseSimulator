@@ -29,7 +29,7 @@ class DensityMatrix {
         int _n_qubits;
         int _dim; // 2^n
         MatrixXcd _data;
-        MatrixXcd applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices);
+        MatrixXcd applyGateMatrix(const MatrixXcd& gate, const vector<int>& qubitIndices);
         MatrixXcd tensoredNoiseChannels(const Matrix2cd& krausOp);
 };
 
