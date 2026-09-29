@@ -3,6 +3,13 @@ project(quantum_noise_sim)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+execute_process(
+    COMMAND python -c "import pybind11; print(pybind11.get_cmake_dir())"
+    OUTPUT_VARIABLE pybind11_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
 FetchContent_Declare(
     eigen
@@ -10,6 +17,7 @@ FetchContent_Declare(
     GIT_TAG        3.4.0
     GIT_SHALLOW    TRUE
 )
+set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(eigen)
 
 find_package(Eigen3 REQUIRED)
@@ -46,13 +54,16 @@ endif()
 option(BUILD_TESTS "Build C++ tests" OFF)
 
 if(BUILD_TESTS)
+    enable_testing()
     find_package(GTest REQUIRED)
-    add_executable(test_state_vector tests/cpp/test_state_vector.cpp)
-    target_link_libraries(test_state_vector qnoise_core GTest::GTest GTest::Main)
-    add_executable(test_density_matrix tests/cpp/test_density_matrix.cpp)
-    target_link_libraries(test_density_matrix qnoise_core GTest::GTest GTest::Main)
-    add_executable(test_noise_channels tests/cpp/test_noise_channels.cpp)
-    target_link_libraries(test_noise_channels qnoise_core GTest::GTest GTest::Main)
+
+    set(TEST_FILES test_measurement test_state_vector test_density_matrix test_noise_channels)
+
+    foreach(test ${TEST_FILES})
+        add_executable(${test} tests/cpp/${test}.cpp)
+        target_link_libraries(${test} GTest::gtest GTest::gtest_main qnoise_core)
+        add_test(NAME ${test} COMMAND ${test})
+    endforeach()
 endif()
 
 if(NOT SKBUILD)

@@ -1,4 +1,4 @@
-#include "stateVector.h"
+#include "stateVector.hpp"
 #include <cmath>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/KroneckerProduct>
@@ -11,7 +11,7 @@ using namespace Eigen;
 /*
 This is currently not optimized to be able able to scale because of the construction of the full matrix.
 Every full matrix that we are multiplying by the state vector when applying our gates is 2^n x 2^n dimensions,
-which multiplying by another statevector of 2^nx2^n gives a time of 4^n which is not practical. This should be scaled
+which multiplying by another stateVector of 2^nx2^n gives a time of 4^n which is not practical. This should be scaled
 before completeion.
 */
 
@@ -26,21 +26,24 @@ stateVector::stateVector(int numQubits) {
 } 
 
 void stateVector::applyGate(const string gateName, const vector<int>& qubitIndices) {
-    auto it = Qnoise::gateMap.find(gateName);
+    vector<int> controlQubits = {};
+    int numQubits = qubitIndices.size();
 
-    if(it == Qnoise::gateMap.end()) {
-        throw invalid_argument("Gate not supported: " + gateName);
+    if(numQubits > 1) {
+        controlQubits.assign(qubitIndices.begin() + 1, qubitIndices.begin() + numQubits);
     }
 
-    if(qubitIndices.size() > 1 && it->second.rows() == 2 && it->second.cols() == 2) {
+    auto gate = Qnoise::getGateMatrix(gateName, controlQubits);
+
+    if(qubitIndices.size() > 1 && gate.rows() == 2 && gate.cols() == 2) {
         //If the same single qubit gate needs to be applied to multiple qubits
         for(auto& qbit: qubitIndices) {
-            applyGate(it->second, {qbit});
+            applyGate(gate, {qbit});
         }
     }
     else {
         //Two qubit state
-        applyGate(it->second, qubitIndices);
+        applyGate(gate, qubitIndices);
     }
 }
 

@@ -4,7 +4,7 @@
 #include <pybind11/complex.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
-#include "core/stateVector/stateVector.h"
+#include "core/stateVector/stateVector.hpp"
 #include "core/DensityMatrix/density_matrix.hpp"
 #include "core/channels/AmplitudeDamping/amplitude_damping.hpp"
 #include "core/channels/BitPhaseFlips/bit_phase_flips.hpp"

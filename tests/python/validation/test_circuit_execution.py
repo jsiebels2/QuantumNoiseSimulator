@@ -54,7 +54,7 @@ def is_multi_Qubit_Circuit(gate: str):
             return False
 
 
-def statevectors_match(sv_qiskit, sv_qnoise: qnoise.StateVector) -> bool:
+def stateVectors_match(sv_qiskit, sv_qnoise: qnoise.StateVector) -> bool:
     a = np.array(sv_qiskit)
     b = np.array(sv_qnoise.getCurrentState)
     idx = np.flatnonzero(np.abs(a) > 1e-10)
@@ -72,7 +72,7 @@ def statevectors_match(sv_qiskit, sv_qnoise: qnoise.StateVector) -> bool:
     (1, [("id", 0)]),
 ])
 def test_single_qubit_gates(num_qubits, circuit):
-    assert statevectors_match(
+    assert stateVectors_match(
         construct_qiskit_circuit(num_qubits, circuit),
         construct_qnoise_circuit(num_qubits, circuit),
     )
@@ -85,7 +85,7 @@ def test_single_qubit_gates(num_qubits, circuit):
     (2, [("x", 0), ("sw", (0, 1))]),              # swap flips qubits
 ])
 def test_two_qubit_gates(num_qubits, circuit):
-    assert statevectors_match(
+    assert stateVectors_match(
         construct_qiskit_circuit(num_qubits, circuit),
         construct_qnoise_circuit(num_qubits, circuit),
     )
@@ -99,7 +99,7 @@ def test_two_qubit_gates(num_qubits, circuit):
     (3, [("h", 0), ("h", 1), ("x", 2), ("cz", (0, 1)), ("cx", (1, 2)), ("z", 0)]),
 ])
 def test_composite_circuits(num_qubits, circuit):
-    assert statevectors_match(
+    assert stateVectors_match(
         construct_qiskit_circuit(num_qubits, circuit),
         construct_qnoise_circuit(num_qubits, circuit),
     )

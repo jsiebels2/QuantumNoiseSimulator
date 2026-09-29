@@ -3,7 +3,7 @@
 #include "core/channels/BitPhaseFlips/bit_phase_flips.cpp"
 #include "core/channels/DepolarizingNoise/depolarizing_noise.cpp"
 #include "core/channels/PhaseDamping/phase_damping.cpp"
-#include "core/stateVector/stateVector.h"
+#include "core/stateVector/stateVector.hpp"
 #include "core/DensityMatrix/density_matrix.hpp"
 
 TEST(NoiseChannelTest, TestAmplitudDampingPurity) {

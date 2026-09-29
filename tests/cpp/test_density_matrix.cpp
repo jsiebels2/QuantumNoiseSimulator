@@ -1,5 +1,5 @@
 #include "core/DensityMatrix/density_matrix.hpp"
-#include "core/stateVector/stateVector.h"
+#include "core/stateVector/stateVector.hpp"
 #include <gtest/gtest.h>
 
 TEST(DensityMatrixTest, FromStateVector) {
