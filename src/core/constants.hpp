@@ -121,8 +121,6 @@ namespace Qnoise {
 
         CNU = Eigen::kroneckerProduct(MatrixXcd::Identity(std::pow(2, n), std::pow(2, n)) - pN, MatrixXcd::Identity(2,2)) + Eigen::kroneckerProduct(pN, baseMatrix);
 
-        cout << "I have a valid CNU" << endl;
-
         return CNU;
     }
 

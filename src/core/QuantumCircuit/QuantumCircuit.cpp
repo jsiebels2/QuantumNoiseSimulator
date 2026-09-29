@@ -45,7 +45,13 @@ DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, dou
     stateVector sv(_n_qubits);
 
     for(auto& op: circuit) {
+        if(op.gate == "measure") {
+            measureStateVector(op.qubits);
+            sv = currentSv;
+            continue;
+        }
         sv.applyGate(op.gate, op.qubits);
+        currentSv = sv;
     }
 
     DensityMatrix densityMatrix = DensityMatrix::fromStateVector(sv);
