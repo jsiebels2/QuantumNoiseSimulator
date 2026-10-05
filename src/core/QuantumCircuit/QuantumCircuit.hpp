@@ -21,7 +21,6 @@ class QuantumCircuit {
         stateVector executeWithoutNoise();
         DensityMatrix executeWithPosteriorNoise(string noiseChannel, double gamma);
         DensityMatrix executeConcurrentNoise(string noiseChannel, double gamma);
-        void measureStateVector(vector<int> qubit);
 
         vector<GateOp> getCircuit() { return circuit; }
         VectorXcd getCurrentStateVector() { return currentSv.getCurrentState(); }
@@ -33,8 +32,13 @@ class QuantumCircuit {
         stateVector currentSv;
         DensityMatrix currentDm;
         std::mt19937 gen;
-        double getProbZero(int qubit);
+        double getProbZeroSv(int qubit);
+        double getProbZeroDm(int qubit);
         void collapseStateVector(int qubit, int m);
+        void collapseDensityMatrix(int qubit, int m);
+        void measureStateVector(vector<int> qubit);
+        void measureDensityMatrix(vector<int> qubits);
+        MatrixXcd getMeasurementOperator(int qubit, int m);
 
 };
 

@@ -98,8 +98,7 @@ void DensityMatrix::applyKrausOperator(const vector<MatrixXcd>& krausOp, const v
         if(qubitIndices.size() > 1) {
             newK = tensoredNoiseChannels(K);
         }
-        rhoPrime += applyGateMatrix(newK, qubitIndices);
-        cout << rhoPrime << endl;
+        rhoPrime += applyGateMatrix (newK, qubitIndices);
     }
     _data = rhoPrime;
 }

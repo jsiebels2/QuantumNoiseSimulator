@@ -62,10 +62,8 @@ TEST(MeasurementTest, PosteriorNoiseCollapseKnownState) {
     qc.addGate("measure", {0});
     qc.executeWithPosteriorNoise("depolarizing-noise", 0);
 
-    cout << "cleanly ran execution" << endl; //debug
 
     Eigen::VectorXcd sv = qc.getCurrentStateVector();
-    cout << sv;
     EXPECT_NEAR(std::abs(sv[0]), 0.0, 1e-9);  // |0⟩ amplitude = 0
     EXPECT_NEAR(std::abs(sv[1]), 1.0, 1e-9);  // |1⟩ amplitude = 1
 }
@@ -111,4 +109,15 @@ TEST(MeasurementTest, PosteriorNoiseMeasurementStatistics) {
     // Expect roughly 50/50, within 10%
     EXPECT_GT(zeros, 400);
     EXPECT_GT(ones, 400);
+}
+
+TEST(MeasurementTest, ConcurrentNoiseCollapseKnownStateDM) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("x", {0});
+    qc.addGate("measure", {0});
+    qc.executeConcurrentNoise("depolarizing-noise", 0);
+
+    Eigen::MatrixXcd dm = qc.getCurrentDensityMatrix();
+    EXPECT_NEAR(dm(0, 0).real(), 0.0, 1e-9);  // |0⟩ probability = 0
+    EXPECT_NEAR(dm(1, 1).real(), 1.0, 1e-9);  // |1⟩ probability = 1
 }
