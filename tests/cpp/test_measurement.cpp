@@ -121,3 +121,45 @@ TEST(MeasurementTest, ConcurrentNoiseCollapseKnownStateDM) {
     EXPECT_NEAR(dm(0, 0).real(), 0.0, 1e-9);  // |0⟩ probability = 0
     EXPECT_NEAR(dm(1, 1).real(), 1.0, 1e-9);  // |1⟩ probability = 1
 }
+
+TEST(MeasurementTest, ConcurrentNoiseNormPreserved) {
+    QuantumCircuit qc = QuantumCircuit(2);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+    qc.executeConcurrentNoise("depolarizing-noise", 0);
+
+    Eigen::MatrixXcd dm = qc.getCurrentDensityMatrix();
+    double trace = dm.trace().real();
+    EXPECT_NEAR(trace, 1.0, 1e-9);
+}
+
+TEST(MeasurementTest, ConcurrentNoiseIdempotent) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+    qc.addGate("measure", {0});
+    qc.executeConcurrentNoise("depolarizing-noise", 0);
+
+    Eigen::MatrixXcd dm = qc.getCurrentDensityMatrix();
+    // One diagonal must be ~0, other ~1
+    EXPECT_TRUE(
+        (std::abs(dm(0,0).real()) < 1e-9 && std::abs(dm(1,1).real() - 1.0) < 1e-9) ||
+        (std::abs(dm(1,1).real()) < 1e-9 && std::abs(dm(0,0).real() - 1.0) < 1e-9)
+    );
+}
+
+TEST(MeasurementTest, ConcurrentNoiseMeasurementStatistics) {
+    int zeros = 0, ones = 0;
+    for(int i = 0; i < 1000; i++) {
+        QuantumCircuit qc = QuantumCircuit(1);
+        qc.addGate("h", {0});
+        qc.addGate("measure", {0});
+        qc.executeConcurrentNoise("depolarizing-noise", 0);
+
+        Eigen::MatrixXcd dm = qc.getCurrentDensityMatrix();
+        if(dm(0,0).real() > 0.5) zeros++;
+        else ones++;
+    }
+    EXPECT_GT(zeros, 400);
+    EXPECT_GT(ones, 400);
+}

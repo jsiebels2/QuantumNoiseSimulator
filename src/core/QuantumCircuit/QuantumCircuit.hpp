@@ -2,6 +2,7 @@
 #define QUANTUMCIRCUIT 
 
 #include <map>
+#include <optional>
 #include <random>
 #include "core/stateVector/stateVector.hpp"
 #include "core/DensityMatrix/density_matrix.hpp"
@@ -18,9 +19,9 @@ class QuantumCircuit {
     public:
         explicit QuantumCircuit(int qubits);
         void addGate(string gate, vector<int> qubits);
-        stateVector executeWithoutNoise();
-        DensityMatrix executeWithPosteriorNoise(string noiseChannel, double gamma);
-        DensityMatrix executeConcurrentNoise(string noiseChannel, double gamma);
+        stateVector executeWithoutNoise(std::optional<int> numShots = std::nullopt);
+        DensityMatrix executeWithPosteriorNoise(string noiseChannel, double gamma, std::optional<int> numShots = std::nullopt);
+        DensityMatrix executeConcurrentNoise(string noiseChannel, double gamma, std::optional<int> numShots = std::nullopt);
 
         vector<GateOp> getCircuit() { return circuit; }
         VectorXcd getCurrentStateVector() { return currentSv.getCurrentState(); }

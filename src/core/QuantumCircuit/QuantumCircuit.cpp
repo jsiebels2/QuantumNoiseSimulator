@@ -26,7 +26,9 @@ void QuantumCircuit::addGate(string gate, vector<int> qubits) {
     circuit.push_back(operation);
 }
 
-stateVector QuantumCircuit::executeWithoutNoise() {
+stateVector QuantumCircuit::executeWithoutNoise(std::optional<int> numShots) {
+    int shots = numShots.value_or(1024);
+    
     stateVector sv(_n_qubits);
 
     for(auto& op: circuit) {
@@ -43,7 +45,7 @@ stateVector QuantumCircuit::executeWithoutNoise() {
     return sv;
 }
 
-DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, double gamma) {
+DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, double gamma, std::optional<int> numShots) {
     stateVector sv(_n_qubits);
 
     for(auto& op: circuit) {
@@ -68,7 +70,7 @@ DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, dou
     return densityMatrix;
 }
 
-DensityMatrix QuantumCircuit::executeConcurrentNoise(string noiseChannel, double gamma) {
+DensityMatrix QuantumCircuit::executeConcurrentNoise(string noiseChannel, double gamma, std::optional<int> numShots) {
     stateVector sv(_n_qubits);
     DensityMatrix dm = DensityMatrix::fromStateVector(sv);
     currentDm = dm;
@@ -137,7 +139,7 @@ double QuantumCircuit::getProbZeroDm(int qubit) {
 
     //Just uses the diagonals
     for(int i = 0; i < currentDm.dimensions(); i++) {
-        if((i >> qubit) && 1 == 0) {
+        if(((i >> qubit) & 1) == 0) {
             probZero += dm(i,i).real();
         }
     }
