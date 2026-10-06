@@ -38,16 +38,16 @@ void stateVector::applyGate(const string gateName, const vector<int>& qubitIndic
     if(qubitIndices.size() > 1 && gate.rows() == 2 && gate.cols() == 2) {
         //If the same single qubit gate needs to be applied to multiple qubits
         for(auto& qbit: qubitIndices) {
-            applyGate(gate, {qbit});
+            applyGateMatrix(gate, {qbit});
         }
     }
     else {
         //Two qubit state
-        applyGate(gate, qubitIndices);
+        applyGateMatrix(gate, qubitIndices);
     }
 }
 
-void stateVector::applyGate(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices) {
+void stateVector::applyGateMatrix(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices) {
     int k = qubitIndices.size();
     int groupSize = 1 << k;
     

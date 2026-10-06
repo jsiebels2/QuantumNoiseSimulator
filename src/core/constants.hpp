@@ -107,7 +107,6 @@ namespace Qnoise {
 
     inline Eigen::MatrixXcd constructControlMatrix(const string gateName, Eigen::Matrix2cd baseMatrix, const vector<int> controlQubits) {
         int n = controlQubits.size();
-        cout << n << endl;
         MatrixXcd CNU, pN;
         Matrix2cd outerProdOne;
 

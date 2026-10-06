@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include "../stateVector/stateVector.hpp"
+#include "Eigen/src/Core/Matrix.h"
 
 using namespace std;
 using namespace Eigen;
@@ -17,6 +18,7 @@ class DensityMatrix {
         // Operations
         void applyGate(const string gateName, const vector<int>& qubitIndices);
         void applyKrausOperator(const vector<MatrixXcd>& krausOp, const vector<int>& qubitIndices);
+        void updateDensityMatrix(MatrixXcd newDm) { _data = newDm; }
 
         // Getters
         int numQubits() const { return _n_qubits; }
@@ -29,7 +31,7 @@ class DensityMatrix {
         int _n_qubits;
         int _dim; // 2^n
         MatrixXcd _data;
-        MatrixXcd applyGate(const MatrixXcd& gate, const vector<int>& qubitIndices);
+        MatrixXcd applyGateMatrix(const MatrixXcd& gate, const vector<int>& qubitIndices);
         MatrixXcd tensoredNoiseChannels(const Matrix2cd& krausOp);
 };
 

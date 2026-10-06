@@ -15,8 +15,7 @@
         "rust-lang.rust-analyzer"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
-        "cmake.useCMakePresets": "always"
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
       }
     }
   }

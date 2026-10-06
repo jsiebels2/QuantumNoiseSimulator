@@ -22,7 +22,7 @@ class stateVector {
         int _n_qubits;
         int dimensions_; // 2^n
         VectorXcd data_;
-        void applyGate(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices);
+        void applyGateMatrix(const MatrixXcd& gateMatrix, const vector<int>& qubitIndices);
 };
 
 #endif
