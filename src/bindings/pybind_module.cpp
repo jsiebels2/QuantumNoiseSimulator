@@ -74,8 +74,11 @@ PYBIND11_MODULE(qnoise, m) {
         //methods
         .def(py::init<int>(), py::arg("numQubits"))
         .def("addGate", &QuantumCircuit::addGate, py::arg("gate"), py::arg("qubits"))
+        .def("executeCircuit", &QuantumCircuit::executeCircuit, py::arg("noise-channel"), py::arg("noise-type"), py::arg("gamma"), py::arg("shots") = py::none())
         .def("executeWithoutNoise", &QuantumCircuit::executeWithoutNoise)
         .def("executeWithPosteriorNoise", &QuantumCircuit::executeWithPosteriorNoise, py::arg("noiseChannel"), py::arg("gamma"))
         .def("executeConcurrentNoise", &QuantumCircuit::executeConcurrentNoise, py::arg("noiseChannel"), py::arg("gamma"))
-        .def("getCircuit", &QuantumCircuit::getCircuit);
+        .def("getCircuit", &QuantumCircuit::getCircuit)
+        .def("getCurrentStateVector", &QuantumCircuit::getCurrentStateVector)
+        .def("getCurrentDensityMatrix", &QuantumCircuit::getCurrentDensityMatrix);
 }
