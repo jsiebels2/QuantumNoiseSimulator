@@ -1,9 +1,14 @@
 #include "core/QuantumCircuit/QuantumCircuit.hpp"
 #include "Eigen/src/Core/Matrix.h"
+#include "core/DensityMatrix/density_matrix.hpp"
 #include "core/constants.hpp"
+#include "core/stateVector/stateVector.hpp"
 #include "unsupported/Eigen/src/KroneckerProduct/KroneckerTensorProduct.h"
 #include <cmath>
+#include <cstddef>
+#include <exception>
 #include <random>
+#include <string>
 
 NoiseChannel createNoiseChannel(string nc, double gamma) {
     if(nc == "amplitude-damping") return NoiseChannel::AmplitudeDampingChannel(gamma);
@@ -19,46 +24,69 @@ NoiseChannel createNoiseChannel(string nc, double gamma) {
         "bit-phase-flips");
 }
 
-QuantumCircuit::QuantumCircuit(int qubits) : _n_qubits(qubits), currentSv(qubits), gen(std::random_device{}()) {}
+QuantumCircuit::QuantumCircuit(int qubits) : _n_qubits(qubits), currentSv(qubits), gen(std::random_device{}()), result(stateVector(qubits), std::pow(2, _n_qubits)) {}
 
 void QuantumCircuit::addGate(string gate, vector<int> qubits) {
     GateOp operation(gate, qubits);
     circuit.push_back(operation);
 }
 
-stateVector QuantumCircuit::executeWithoutNoise(std::optional<int> numShots) {
+//TODO
+unordered_map<string, int> QuantumCircuit::executeCircuit(std::string noiseChannel, std::string noiseType, double gamma, std::optional<int> numShots) {
     int shots = numShots.value_or(1024);
-    
-    stateVector sv(_n_qubits);
 
-    for(auto& op: circuit) {
-        if(op.gate == "measure") {
-            measureStateVector(op.qubits);
-            sv = currentSv;
-            continue;
+    for(int i = 0; i < shots; i++) {
+        currentSv = stateVector(_n_qubits);
+        currentDm = DensityMatrix::fromStateVector(currentSv);
+
+        if(noiseType == "concurrent-noise") {
+            result.dm = executeConcurrentNoise(noiseChannel, gamma);
         }
-
-        sv.applyGate(op.gate, op.qubits);
-        currentSv = sv;
+        else if (noiseType == "posterior-noise"){
+            result.dm = executeWithPosteriorNoise(noiseChannel, gamma);
+        }
+        else {
+            result.sv = executeWithoutNoise();
+        }
     }
 
-    return sv;
+    return result.measurmentStatistics;
 }
 
-DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, double gamma, std::optional<int> numShots) {
-    stateVector sv(_n_qubits);
+stateVector QuantumCircuit::executeWithoutNoise() {    
+    string bitString = string((size_t)_n_qubits, '-');
 
     for(auto& op: circuit) {
         if(op.gate == "measure") {
-            measureStateVector(op.qubits);
-            sv = currentSv;
+            for(auto& q: op.qubits) {
+                int measurement = measureStateVector(q);
+                bitString[q] = measurement + '0';
+            }
             continue;
         }
-        sv.applyGate(op.gate, op.qubits);
-        currentSv = sv;
+
+        currentSv.applyGate(op.gate, op.qubits);
     }
 
-    DensityMatrix densityMatrix = DensityMatrix::fromStateVector(sv);
+    result.measurmentStatistics[bitString]++;
+    return currentSv;
+}
+
+DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, double gamma) {
+    string bitString = string((size_t)_n_qubits, '-');
+
+    for(auto& op: circuit) {
+        if(op.gate == "measure") {
+            for(auto& q: op.qubits) {
+                int measurement = measureStateVector(q);
+                bitString[q] = measurement + '0';
+            }
+            continue;
+        }
+        currentSv.applyGate(op.gate, op.qubits);
+    }
+
+    DensityMatrix densityMatrix = DensityMatrix::fromStateVector(currentSv);
     currentDm = densityMatrix;
     NoiseChannel nc = createNoiseChannel(noiseChannel, gamma);
 
@@ -67,55 +95,55 @@ DensityMatrix QuantumCircuit::executeWithPosteriorNoise(string noiseChannel, dou
         currentDm = densityMatrix;
     }
 
+    result.measurmentStatistics[bitString]++;
     return densityMatrix;
 }
 
-DensityMatrix QuantumCircuit::executeConcurrentNoise(string noiseChannel, double gamma, std::optional<int> numShots) {
-    stateVector sv(_n_qubits);
-    DensityMatrix dm = DensityMatrix::fromStateVector(sv);
-    currentDm = dm;
+DensityMatrix QuantumCircuit::executeConcurrentNoise(string noiseChannel, double gamma) {
+    currentDm = DensityMatrix::fromStateVector(currentSv);
     NoiseChannel nc = createNoiseChannel(noiseChannel, gamma);
+    string bitString = std::string((size_t)_n_qubits, '-');
 
     for(auto& op: circuit) {
         if(op.gate == "measure") {
-            measureDensityMatrix(op.qubits);
-            dm = currentDm;
+            for(auto& q: op.qubits) {
+                int measurement = measureDensityMatrix(q);
+                bitString[q] = measurement + '0';
+            }
             continue;
         }
-        dm.applyGate(op.gate, op.qubits);
+        currentDm.applyGate(op.gate, op.qubits);
         for(auto& q: op.qubits) {
-            dm.applyKrausOperator(nc.getKrausOps(), {q});
+            currentDm.applyKrausOperator(nc.getKrausOps(), {q});
         }
-        currentDm = dm; //this may need to change
     }
 
-    return dm;
+    result.measurmentStatistics[bitString]++;
+    return currentDm;
 }
 
-void QuantumCircuit::measureStateVector(vector<int> qubits) {
-    for(auto& q: qubits) {
-        double probZero = getProbZeroSv(q);
-        int state = 0;
+int QuantumCircuit::measureStateVector(int q) {
+    double probZero = getProbZeroSv(q);
+    int state = 0;
 
-        std::uniform_real_distribution<double> distrib(0.0, 1.0);
-        double radndomNum = distrib(gen);
-        if(radndomNum > probZero) state = 1;
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+    double radndomNum = distrib(gen);
+    if(radndomNum > probZero) state = 1;
 
-        collapseStateVector(q, state);
-    }
+    collapseStateVector(q, state);
+    return state;
 }
 
-void QuantumCircuit::measureDensityMatrix(vector<int> qubits) {
-    for(auto& q: qubits) {
-        double probZero = getProbZeroDm(q);
-        int state = 0;
+int QuantumCircuit::measureDensityMatrix(int q) {
+    double probZero = getProbZeroDm(q);
+    int state = 0;
 
-        std::uniform_real_distribution<double> distrib(0.0, 1.0);
-        double radndomNum = distrib(gen);
-        if(radndomNum > probZero) state = 1;
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+    double radndomNum = distrib(gen);
+    if(radndomNum > probZero) state = 1;
 
-        collapseDensityMatrix(q, state);
-    }
+    collapseDensityMatrix(q, state);
+    return state;
 }
 
 double QuantumCircuit::getProbZeroSv(int qubit) {
@@ -151,7 +179,7 @@ void QuantumCircuit::collapseStateVector(int qubit, int m) {
     VectorXcd sv = currentSv.getCurrentState();
 
     for(int i = 0; i < currentSv.dimensions(); i++) {
-        if((i >> qubit) != m) {
+        if(((i >> qubit) & 1) != m) {
             sv[i] = 0.0;
         }
     }

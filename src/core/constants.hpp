@@ -2,7 +2,6 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <unordered_map>
-#include <numbers>
 #include "channels/noise_channels.hpp"
 #include <complex>
 #include <unsupported/Eigen/KroneckerProduct>

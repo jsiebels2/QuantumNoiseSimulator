@@ -163,3 +163,80 @@ TEST(MeasurementTest, ConcurrentNoiseMeasurementStatistics) {
     EXPECT_GT(zeros, 400);
     EXPECT_GT(ones, 400);
 }
+
+TEST(ExecutionTest, NoiseCountsSumToShots) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("", "", 0, 1024);
+    int total = 0;
+    for(auto& [key, val] : counts) total += val;
+    EXPECT_EQ(total, 1024);
+}
+
+TEST(ExecutionTest, NoNoiseKnownStateDeterministic) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("x", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("", "", 0, 100);
+    EXPECT_EQ(counts["1"], 100);
+    EXPECT_EQ(counts.count("0"), 0);
+}
+
+TEST(ExecutionTest, NoNoiseRoughly50_50) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("", "", 0, 1000);
+    EXPECT_GT(counts["0"], 400);
+    EXPECT_GT(counts["1"], 400);
+}
+
+TEST(ExecutionTest, NoNoiseBellStateCorrelated) {
+    QuantumCircuit qc = QuantumCircuit(2);
+    qc.addGate("h", {0});
+    qc.addGate("cx", {0, 1});
+    qc.addGate("measure", {0, 1});
+
+    auto counts = qc.executeCircuit("", "", 0, 1000);
+    EXPECT_EQ(counts.count("01"), 0);
+    EXPECT_EQ(counts.count("10"), 0);
+    EXPECT_GT(counts["00"], 400);
+    EXPECT_GT(counts["11"], 400);
+}
+
+TEST(ExecutionTest, ConcurrentNoiseCountsSumToShots) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("depolarizing-noise", "concurrent-noise", 0, 1024);
+    int total = 0;
+    for(auto& [key, val] : counts) total += val;
+    EXPECT_EQ(total, 1024);
+}
+
+TEST(ExecutionTest, PosteriorNoiseCountsSumToShots) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("depolarizing-noise", "posterior-noise", 0, 1024);
+    int total = 0;
+    for(auto& [key, val] : counts) total += val;
+    EXPECT_EQ(total, 1024);
+}
+
+TEST(ExecutionTest, DefaultShotsIs1024) {
+    QuantumCircuit qc = QuantumCircuit(1);
+    qc.addGate("h", {0});
+    qc.addGate("measure", {0});
+
+    auto counts = qc.executeCircuit("", "", 0, std::nullopt);
+    int total = 0;
+    for(auto& [key, val] : counts) total += val;
+    EXPECT_EQ(total, 1024);
+}
